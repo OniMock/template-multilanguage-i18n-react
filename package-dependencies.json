@@ -1,0 +1,24 @@
+{
+  "name": "i18n-template-dependencies",
+  "description": "Required dependencies for the i18n system template",
+  "dependencies": {
+    "lucide-react": "^0.462.0",
+    "flag-icons": "^7.5.0"
+  },
+  "devDependencies": {
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "installation": {
+    "command": "npm install lucide-react flag-icons",
+    "devCommand": "npm install -D tailwindcss-animate",
+    "note": "tailwindcss-animate is only needed if you're using Tailwind CSS animations"
+  },
+  "css": {
+    "required": "@import \"flag-icons/css/flag-icons.min.css\";",
+    "location": "Add this import to your main CSS file (index.css or App.css)"
+  }
+}
