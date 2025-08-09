@@ -1,8 +1,18 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Globe } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
-import { useLanguage } from '../hooks/use-language';
+import { useLanguage } from '../contexts/LanguageProvider';
 
-const LanguageSelector = () => {
+/**
+ * LanguageSelector Component
+ * 
+ * ⚠️ IMPORTANTE: Este componente deve ser adaptado para seguir o tema do seu site!
+ * 
+ * Exemplos de adaptação:
+ * - Tema escuro: Mantenha as classes atuais (glass-card, text-gray-300)
+ * - Tema claro: Use bg-white/80, text-gray-700, border border-gray-200
+ * - Múltiplos temas: Implemente lógica condicional baseada no tema ativo
+ */
+const LanguageSelector: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { currentLanguage, availableLanguages, setLanguage } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);

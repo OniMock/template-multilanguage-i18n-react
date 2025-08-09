@@ -1,10 +1,4 @@
-import { useContext } from 'react';
-import { LanguageContext } from '../contexts/LanguageContext';
+// Este hook agora está integrado no LanguageProvider.tsx
+// Importe diretamente de '../contexts/LanguageProvider'
 
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
-};
+export { useLanguage } from '../contexts/LanguageProvider';

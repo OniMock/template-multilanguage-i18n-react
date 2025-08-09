@@ -1,87 +1,129 @@
-import { useState, ReactNode, useEffect } from 'react';
-import { LanguageContext } from './LanguageContext';
-import { LanguageConfig } from '../types/language';
-import { languageFiles, getAvailableLanguages } from '../lang';
-import { getCookie, setCookie } from '../utils/cookies';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { translations as ptBrTranslations, languageConfig as ptBrConfig } from '../locales/ptBr';
+import { translations as enTranslations, languageConfig as enConfig } from '../locales/en';
+import { translations as esTranslations, languageConfig as esConfig } from '../locales/es';
+import { translations as frTranslations, languageConfig as frConfig } from '../locales/fr';
+import { translations as deTranslations, languageConfig as deConfig } from '../locales/de';
 
-const LANGUAGE_COOKIE = 'preferred_language';
-const DEFAULT_LANGUAGE = 'en';
+interface LanguageFile {
+  code: string;
+  name: string;
+  nativeName: string;
+  flag: string;
+  translations: any;
+}
 
-// Detectar idioma do navegador de forma dinâmica
-const detectBrowserLanguage = (): string => {
-  const browserLang = navigator.language || navigator.languages?.[0];
-  if (!browserLang) return DEFAULT_LANGUAGE;
+interface LanguageContextType {
+  currentLanguage: string;
+  availableLanguages: LanguageFile[];
+  setLanguage: (language: string) => void;
+  t: (key: string, variables?: Record<string, string>) => string;
+}
 
-  const availableLanguages = getAvailableLanguages();
-  // Primeiro, tenta match exato (ex: 'pt-BR' -> 'pt-br')
-  const exactMatch = availableLanguages.find(
-    (lang) => lang.toLowerCase() === browserLang.toLowerCase()
-  );
-  if (exactMatch) return exactMatch;
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-  // Se não encontrar match exato, tenta por prefixo (ex: 'pt-BR' -> 'pt')
-  const langPrefix = browserLang.split('-')[0].toLowerCase();
-  const prefixMatch = availableLanguages.find((lang) =>
-    lang.toLowerCase().startsWith(langPrefix)
-  );
-  if (prefixMatch) return prefixMatch;
-
-  // Se não encontrar nada, retorna o padrão
-  return DEFAULT_LANGUAGE;
+const languageFiles: Record<string, LanguageFile> = {
+  'pt-br': {
+    ...ptBrConfig,
+    translations: ptBrTranslations
+  },
+  'en': {
+    ...enConfig,
+    translations: enTranslations
+  },
+  'es': {
+    ...esConfig,
+    translations: esTranslations
+  },
+  'fr': {
+    ...frConfig,
+    translations: frTranslations
+  },
+  'de': {
+    ...deConfig,
+    translations: deTranslations
+  }
 };
 
-type Props = { children: ReactNode };
+const getAvailableLanguages = (): LanguageFile[] => {
+  return Object.values(languageFiles);
+};
 
-export const LanguageProvider = ({ children }: Props) => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
-    const savedLanguage = getCookie(LANGUAGE_COOKIE);
-    const availableLanguages = getAvailableLanguages();
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [currentLanguage, setCurrentLanguage] = useState<string>('en');
 
-    // Prioridade: Cookie -> Navegador -> Padrão -> Primeiro disponível
-    if (savedLanguage && availableLanguages.includes(savedLanguage)) {
-      return savedLanguage;
+  useEffect(() => {
+    // Recupera idioma do cookie ou usa o idioma do navegador
+    const savedLanguage = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('language='))
+      ?.split('=')[1];
+
+    if (savedLanguage && languageFiles[savedLanguage]) {
+      setCurrentLanguage(savedLanguage);
+    } else {
+      // Detecta idioma do navegador
+      const browserLanguage = navigator.language.toLowerCase();
+      if (browserLanguage.startsWith('pt')) {
+        setCurrentLanguage('pt-br');
+      } else if (browserLanguage.startsWith('es')) {
+        setCurrentLanguage('es');
+      } else if (browserLanguage.startsWith('fr')) {
+        setCurrentLanguage('fr');
+      } else if (browserLanguage.startsWith('de')) {
+        setCurrentLanguage('de');
+      } else {
+        setCurrentLanguage('en');
+      }
     }
+  }, []);
 
-    const browserLang = detectBrowserLanguage();
-    if (availableLanguages.includes(browserLang)) {
-      return browserLang;
-    }
-
-    return availableLanguages.includes(DEFAULT_LANGUAGE)
-      ? DEFAULT_LANGUAGE
-      : availableLanguages[0];
-  });
-
-  const setLanguage = (lang: string) => {
-    if (languageFiles[lang]) {
-      setCurrentLanguage(lang);
-      setCookie(LANGUAGE_COOKIE, lang);
+  const setLanguage = (language: string) => {
+    if (languageFiles[language]) {
+      setCurrentLanguage(language);
+      // Salva no cookie
+      document.cookie = `language=${language}; path=/; max-age=31536000`; // 1 ano
     }
   };
 
-  const t = (key: string, vars?: Record<string, string | number>): string => {
-    const currentTranslations =
-      languageFiles[currentLanguage]?.translations || {};
-    const template = currentTranslations[key] || key;
-
-    if (!vars) return template;
-
-    return Object.entries(vars).reduce(
-      (acc, [varKey, varValue]) =>
-        acc.replace(new RegExp(`\\{${varKey}\\}`, 'g'), String(varValue)),
-      template
-    );
+  const getNestedValue = (obj: any, path: string): string => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : null;
+    }, obj);
   };
 
-  const availableLanguages: LanguageConfig[] = Object.values(languageFiles).map(
-    (lang) => lang.config
-  );
+  const t = (key: string, variables?: Record<string, string>): string => {
+    const currentTranslations = languageFiles[currentLanguage]?.translations;
+    const fallbackTranslations = languageFiles['en']?.translations;
+    
+    let translation = getNestedValue(currentTranslations, key);
+    
+    // Se não encontrar na linguagem atual, tenta no fallback
+    if (!translation) {
+      translation = getNestedValue(fallbackTranslations, key);
+    }
+    
+    // Se ainda não encontrar, retorna a chave
+    if (!translation) {
+      console.warn(`Translation key not found: ${key}`);
+      return key;
+    }
+
+    // Substitui variáveis se fornecidas
+    if (variables) {
+      Object.keys(variables).forEach(variable => {
+        translation = translation.replace(`{{${variable}}}`, variables[variable]);
+      });
+    }
+
+    return translation;
+  };
 
   return (
     <LanguageContext.Provider
       value={{
         currentLanguage,
-        availableLanguages,
+        availableLanguages: getAvailableLanguages(),
         setLanguage,
         t,
       }}
@@ -89,4 +131,12 @@ export const LanguageProvider = ({ children }: Props) => {
       {children}
     </LanguageContext.Provider>
   );
+};
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
 };

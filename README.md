@@ -1,6 +1,6 @@
 # Template de Sistema de Internacionalização (i18n)
 
-Este template fornece um sistema completo de internacionalização para aplicações React/TypeScript, incluindo detecção automática de idioma, persistência via cookies, e um seletor visual de idiomas com bandeiras.
+Este template fornece um sistema completo de internacionalização para aplicações React/TypeScript, incluindo detecção automática de idioma, persistência via cookies, seletor visual de idiomas com bandeiras, e arquitetura escalável para múltiplos idiomas.
 
 ## 🚀 Características
 

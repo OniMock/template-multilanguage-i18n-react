@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useLanguage } from '../hooks/use-language';
-import LanguageSelector from '../contexts/LanguageSelector';
+import { LanguageSelector } from './LanguageSelector';
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);

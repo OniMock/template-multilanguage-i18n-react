@@ -1,47 +1,27 @@
-# 📁 Estrutura Completa do Template
+# Estrutura do Template de Internacionalização v2.0
 
-## 🗂️ Visão Geral da Estrutura
+## 📁 Organização dos Arquivos
 
 ```
-templates/i18n-system/
-├── 📄 README.md                    # Documentação principal
-├── 📄 AI-INSTRUCTIONS.md           # Instruções específicas para IA
-├── 📄 TEMPLATE-STRUCTURE.md        # Este arquivo
-├── 📄 package-dependencies.json    # Dependências necessárias
-├── 📄 styles.css                   # CSS necessário
-├── 📄 tailwind-config-example.ts   # Exemplo de config Tailwind
-├── 📄 example-usage.tsx            # Exemplo de uso
-├── 📁 src/                         # Template principal
-│   ├── 📁 contexts/
-│   │   ├── LanguageContext.ts
-│   │   ├── LanguageProvider.tsx
-│   │   └── LanguageSelector.tsx
-│   ├── 📁 hooks/
-│   │   └── use-language.ts
-│   ├── 📁 types/
-│   │   └── language.ts
-│   ├── 📁 utils/
-│   │   └── cookies.ts
-│   └── 📁 lang/
-│       ├── index.ts
-│       ├── en.ts
-│       ├── ptBr.ts
-│       ├── es.ts
-│       ├── fr.ts
-│       └── de.ts
-└── 📁 exemplo/                     # Projeto real completo
-    ├── 📄 README.md
-    ├── 📄 package.json
-    ├── 📄 tailwind.config.ts
-    └── 📁 src/                     # Código completo do projeto real
-        ├── 📁 contexts/
-        ├── 📁 hooks/
-        ├── 📁 types/
-        ├── 📁 utils/
-        ├── 📁 lang/
-        ├── 📁 components/
-        ├── 📁 pages/
-        └── ...
+template-multilanguage-i18n-react/
+├── src/
+│   ├── components/
+│   │   └── LanguageSelector.tsx    # Componente seletor de idioma
+│   ├── contexts/
+│   │   └── LanguageProvider.tsx    # Provider principal com hook integrado
+│   ├── hooks/
+│   │   └── use-language.ts         # Re-export para compatibilidade
+│   ├── locales/                    # Nova estrutura de idiomas
+│   │   ├── ptBr.ts                # Config + traduções português brasileiro
+│   │   ├── en.ts                  # Config + traduções inglês
+│   │   ├── es.ts                  # Config + traduções espanhol
+│   │   ├── fr.ts                  # Config + traduções francês
+│   │   └── de.ts                  # Config + traduções alemão
+│   └── types/
+│       └── language.ts            # Definições de tipos TypeScript
+├── example-usage.tsx              # Exemplo de implementação completo
+├── README.md                      # Documentação principal
+└── TEMPLATE-STRUCTURE.md          # Este arquivo
 ```
 
 ## 📋 Descrição dos Arquivos
